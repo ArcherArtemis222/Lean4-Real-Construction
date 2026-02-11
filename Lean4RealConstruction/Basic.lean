@@ -924,3 +924,4 @@ theorem rat_mul_eq_mul (p q : Q) : myRat (p * q) = myRat p * myRat q := by
     _ = nnmul (myRat p)⁺ (myRat q)⁺ - nnmul (myRat p)⁺ (myRat q)⁻ - nnmul (myRat p)⁻ (myRat q)⁺ + nnmul (myRat p)⁻ (myRat q)⁻ := by simp only [← rat_posPart_eq, ← rat_negPart_eq]
     -- 化簡至此，已是實數乘法的定義。
     _ = myRat p * myRat q := by rfl
+--
