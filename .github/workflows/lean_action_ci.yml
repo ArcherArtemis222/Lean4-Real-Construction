@@ -35,7 +35,7 @@ jobs:
           lake build
 
           # 3. 執行生成 Lean4RealConstruction
-          $DOCGEN_EXE
+          lake build Lean4RealConstruction:docs
           doc-gen4 -h
 
       - name: Upload artifact
