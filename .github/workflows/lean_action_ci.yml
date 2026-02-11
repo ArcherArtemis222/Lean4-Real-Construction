@@ -17,7 +17,7 @@ jobs:
 
       # 使用官方提供的 Action，這會自動裝好 elan, lean, lake 並設定好 PATH
       - name: Setup Lean
-        uses: leanprover-community/lean-action@v1
+        uses: leanprover/lean-action@v1
         with:
           # 它會自動讀取你的 lean-toolchain 檔案
           auto-bundle: false
