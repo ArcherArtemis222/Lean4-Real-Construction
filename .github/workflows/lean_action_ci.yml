@@ -22,7 +22,8 @@ jobs:
 
       - name: Build and Generate Docs
         run: |
-          # 1. 進入 doc-gen4 目錄編譯
+          # 1. 下載、進入 doc-gen4 目錄編譯
+          git clone https://github.com/leanprover/doc-gen4.git
           cd doc-gen4
           elan override set $(cat ../lean-toolchain)
           lake build
