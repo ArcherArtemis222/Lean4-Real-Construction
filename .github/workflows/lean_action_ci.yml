@@ -19,9 +19,14 @@ jobs:
       # 直接在雲端下載並安裝 leanink，避開專案依賴衝突
       - name: Install LeanInk Globally
         run: |
+          # 確保路徑在當前 shell 生效
+          export PATH="$HOME/.elan/bin:$PATH"
           git clone https://github.com/leanprover/leanink.git
           cd leanink
+          # 指定使用專案定義的 toolchain
+          elan override set $(cat ../lean-toolchain)
           lake build
+          # 把編譯好的 leanink 執行檔路徑傳給後面的步驟
           echo "$(pwd)/.lake/build/bin" >> $GITHUB_PATH
 
       - name: Build My Project
