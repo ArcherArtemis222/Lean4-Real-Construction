@@ -1,14 +1,39 @@
-name: Lean Action CI
-
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
-
 jobs:
-  build:
+  build_docs:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v5
-      - uses: leanprover/lean-action@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl https://elan.flatmap.org/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      # 直接在雲端下載並安裝 leanink，避開專案依賴衝突
+      - name: Install LeanInk Globally
+        run: |
+          git clone https://github.com/leanprover/leanink.git
+          cd leanink
+          lake build
+          echo "$(pwd)/.lake/build/bin" >> $GITHUB_PATH
+
+      - name: Build My Project
+        run: lake build
+
+      - name: Run LeanInk
+        run: |
+          # 替換成你的主檔案名，例如 MyReal.lean
+          leanink a Lean4RealConstruction/Basic.lean
+          mkdir -p .leanink_out
+          mv RealConstruction.html .leanink_out/index.html
+          # 拷貝必要的 CSS/JS
+          cp -r leanink/static .leanink_out/static || true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.leanink_out'
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
