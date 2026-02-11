@@ -15,39 +15,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install and Run LeanInk
+      # 使用官方提供的 Action，這會自動裝好 elan, lean, lake 並設定好 PATH
+      - name: Setup Lean
+        uses: leanprover-community/lean-action@v1
+        with:
+          # 它會自動讀取你的 lean-toolchain 檔案
+          auto-bundle: false
+
+      - name: Build LeanInk and Project
         run: |
-          # 1. 安裝 elan
-          curl https://elan.flatmap.org/elan-init.sh -sSf | sh -s -- -y
-          # 手動將 elan 加入當前 shell 的 PATH
-          export PATH="$HOME/.elan/bin:$PATH"
-          
-          # 2. 安裝 LeanInk (直接在雲端下載)
-          git clone https://github.com/Paper-Proof/paperproof.git # 注意：我們改用這個 repo 裡的工具，通常更穩
+          # 1. 雲端下載並編譯 LeanInk
           git clone https://github.com/leanprover/leanink.git
-          
           cd leanink
-          # 針對你看到的 copyFile 錯誤進行手動 Patch (如果官方還沒修)
+          # 修正相容性問題
           sed -i 's/copyFile/Lake.copyFile/g' lakefile.lean || true
           sed -i 's/trim/trimAscii/g' lakefile.lean || true
-          
-          # 編譯 LeanInk
           lake build
-          # 將執行檔位置暫存
+          # 取得執行檔路徑
           LEANINK_EXE="$(pwd)/.lake/build/bin/leanink"
           cd ..
 
-          # 3. 編譯你的專案
+          # 2. 編譯你的主專案
           lake build
 
-          # 4. 執行 LeanInk 生成互動式網頁
-          # 假設檔案名是 MyReal.lean
+          # 3. 執行 LeanInk (將 MyReal.lean 換成你的檔名)
           $LEANINK_EXE a Lean4RealConstruction/Basic.lean
           
-          # 5. 整理輸出目錄
+          # 4. 準備輸出的 HTML
           mkdir -p .leanink_out
+          # LeanInk 會產生一個與檔名相同的 HTML 檔案
           mv RealConstruction.html .leanink_out/index.html
-          # 拷貝靜態資源檔案 (CSS/JS)
           cp -r leanink/static .leanink_out/static || true
 
       - name: Upload artifact
