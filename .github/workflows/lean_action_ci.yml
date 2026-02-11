@@ -21,29 +21,32 @@ jobs:
         with:
           # 它會自動讀取你的 lean-toolchain 檔案
           auto-bundle: false
-
       - name: Build LeanInk and Project
         run: |
-          # 1. 雲端下載並編譯 LeanInk
+          # 1. 取得主專案的版本
+          TOOLCHAIN=$(cat lean-toolchain)
+          echo "Using toolchain: $TOOLCHAIN"
+
+          # 2. 處理 LeanInk
           git clone https://github.com/leanprover/leanink.git
           cd leanink
-          # 修正相容性問題
+          
+          # 強制 LeanInk 使用跟主專案一樣的版本，避免 trim/trimAscii 的混亂
+          elan override set $TOOLCHAIN
+          
+          # 根據版本決定要怎麼 Patch (嘗試修復歧義，但不強求 trim)
           sed -i 's/copyFile/Lake.copyFile/g' lakefile.lean || true
-          sed -i 's/trim/trimAscii/g' lakefile.lean || true
+          
           lake build
-          # 取得執行檔路徑
           LEANINK_EXE="$(pwd)/.lake/build/bin/leanink"
           cd ..
 
-          # 2. 編譯你的主專案
+          # 3. 編譯主專案
           lake build
 
-          # 3. 執行 LeanInk (將 MyReal.lean 換成你的檔名)
+          # 4. 生成網頁
           $LEANINK_EXE a Lean4RealConstruction/Basic.lean
-          
-          # 4. 準備輸出的 HTML
           mkdir -p .leanink_out
-          # LeanInk 會產生一個與檔名相同的 HTML 檔案
           mv RealConstruction.html .leanink_out/index.html
           cp -r leanink/static .leanink_out/static || true
 
