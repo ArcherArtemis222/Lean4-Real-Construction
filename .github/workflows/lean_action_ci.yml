@@ -33,7 +33,7 @@ jobs:
 
           # 2. 透過 doc-gen4 生成你專案的文檔
           # 這會自動處理你的所有檔案並生成一個漂亮的網站
-          ./doc-gen4/build/bin/doc-gen4 lib Lean4RealConstruction # 假設你的 library 名稱是 MyReal
+          ./doc-gen4/build/bin/doc-gen4 lib Lean4RealConstruction/Basic # 假設你的 library 名稱是 MyReal
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
