@@ -24,7 +24,7 @@ jobs:
         run: |
           # 1. 確保 lake 已經知道 doc-gen4 的存在 (之前你已經在 lakefile.toml 加過了)
           # 2. 直接執行編譯文檔的指令
-          lake build :docs
+          lake build Lean4RealConstruction:docs
 
           # 3. doc-gen4 預設會把產出的靜態網頁放在這裡
           # 請確認路徑是否為 .lake/build/doc
