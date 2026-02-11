@@ -21,8 +21,8 @@ jobs:
         run: |
           # 確保路徑在當前 shell 生效
           export PATH="$HOME/.elan/bin:$PATH"
-          git clone https://github.com/leanprover/leanink.git
-          cd leanink
+          git clone https://github.com/leanprover/LeanInk
+          cd LeanInk
           # 指定使用專案定義的 toolchain
           elan override set $(cat ../lean-toolchain)
           lake build
