@@ -20,23 +20,16 @@ jobs:
         with:
           auto-bundle: false
 
-      - name: Build and Generate Docs
+      - name: Generate Documentation
         run: |
-          # 1. 下載、進入 doc-gen4 目錄編譯
-          git clone https://github.com/leanprover/doc-gen4.git
-          cd doc-gen4
-          elan override set $(cat ../lean-toolchain)
-          lake build
-          # 取得 doc-gen4 執行檔的絕對路徑
-          DOCGEN_EXE="$(pwd)/.lake/build/bin/doc-gen4"
-          cd ..
+          # 1. 確保 lake 已經知道 doc-gen4 的存在 (之前你已經在 lakefile.toml 加過了)
+          # 2. 直接執行編譯文檔的指令
+          lake build :docs
 
-          # 2. 回到根目錄編譯你的主專案 (確保 olean 檔案存在)
-          lake build
-
-          # 3. 執行生成 Lean4RealConstruction
-          lake build Lean4RealConstruction:docs
-          doc-gen4 -h
+          # 3. doc-gen4 預設會把產出的靜態網頁放在這裡
+          # 請確認路徑是否為 .lake/build/doc
+          mkdir -p .docs_out
+          cp -r .lake/build/doc/* .docs_out/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
