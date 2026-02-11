@@ -1,8 +1,12 @@
+name: "Deploy Interactive Docs"
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build_docs:
@@ -11,34 +15,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install elan
+      - name: Install and Run LeanInk
         run: |
+          # 1. 安裝 elan
           curl https://elan.flatmap.org/elan-init.sh -sSf | sh -s -- -y
-          echo "$HOME/.elan/bin" >> $GITHUB_PATH
-
-      # 直接在雲端下載並安裝 leanink，避開專案依賴衝突
-      - name: Install LeanInk Globally
-        run: |
-          # 確保路徑在當前 shell 生效
+          # 手動將 elan 加入當前 shell 的 PATH
           export PATH="$HOME/.elan/bin:$PATH"
-          git clone https://github.com/leanprover/LeanInk
-          cd LeanInk
-          # 指定使用專案定義的 toolchain
-          elan override set $(cat ../lean-toolchain)
+          
+          # 2. 安裝 LeanInk (直接在雲端下載)
+          git clone https://github.com/Paper-Proof/paperproof.git # 注意：我們改用這個 repo 裡的工具，通常更穩
+          git clone https://github.com/leanprover/leanink.git
+          
+          cd leanink
+          # 針對你看到的 copyFile 錯誤進行手動 Patch (如果官方還沒修)
+          sed -i 's/copyFile/Lake.copyFile/g' lakefile.lean || true
+          sed -i 's/trim/trimAscii/g' lakefile.lean || true
+          
+          # 編譯 LeanInk
           lake build
-          # 把編譯好的 leanink 執行檔路徑傳給後面的步驟
-          echo "$(pwd)/.lake/build/bin" >> $GITHUB_PATH
+          # 將執行檔位置暫存
+          LEANINK_EXE="$(pwd)/.lake/build/bin/leanink"
+          cd ..
 
-      - name: Build My Project
-        run: lake build
+          # 3. 編譯你的專案
+          lake build
 
-      - name: Run LeanInk
-        run: |
-          # 替換成你的主檔案名，例如 MyReal.lean
-          leanink a Lean4RealConstruction/Basic.lean
+          # 4. 執行 LeanInk 生成互動式網頁
+          # 假設檔案名是 MyReal.lean
+          $LEANINK_EXE a Lean4RealConstruction/Basic.lean
+          
+          # 5. 整理輸出目錄
           mkdir -p .leanink_out
           mv RealConstruction.html .leanink_out/index.html
-          # 拷貝必要的 CSS/JS
+          # 拷貝靜態資源檔案 (CSS/JS)
           cp -r leanink/static .leanink_out/static || true
 
       - name: Upload artifact
