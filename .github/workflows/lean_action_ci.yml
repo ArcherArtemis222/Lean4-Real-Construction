@@ -15,43 +15,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 使用官方提供的 Action，這會自動裝好 elan, lean, lake 並設定好 PATH
       - name: Setup Lean
         uses: leanprover/lean-action@v1
         with:
-          # 它會自動讀取你的 lean-toolchain 檔案
           auto-bundle: false
-      - name: Build LeanInk and Project
-        run: |
-          TOOLCHAIN=$(cat lean-toolchain)
-          git clone https://github.com/leanprover/leanink.git
-          cd leanink
-          elan override set $TOOLCHAIN
 
-          # 1. 修正 copyFile 重複定義
-          sed -i 's/def copyFile/def _unused_copyFile/g' lakefile.lean || true
-          
-          # 2. 終極手術：直接讓 checkOutput 永遠回傳 True，避開 String.Slice 的 Prop/Bool 陷阱
-          # 我們把函式內容替換成純粹的 "pure true"
-          sed -i '/def checkOutput/,/pure (/c\def checkOutput (actualStr expectedStr : String) : IO Bool := pure true' lakefile.lean || true
-          
+      - name: Build and Generate Docs
+        run: |
+          # 1. 下載 doc-gen4 (這是官方目前用來生網頁的標準工具)
+          # 它比 leanink 更強大，支援搜尋和跨檔案跳轉
+          git clone https://github.com/leanprover/doc-gen4.git
+          cd doc-gen4
+          # 確保 doc-gen4 跑在你的 toolchain 下
+          elan override set $(cat ../lean-toolchain)
           lake build
-          LEANINK_EXE="$(pwd)/.lake/build/bin/leanink"
           cd ..
 
-          # 3. 編譯主專案
-          lake build
-
-          # 4. 生成網頁
-          $LEANINK_EXE a Lean4RealConstruction/Basic.lean
-          mkdir -p .leanink_out
-          mv RealConstruction.html .leanink_out/index.html
-          cp -r leanink/static .leanink_out/static || true
+          # 2. 透過 doc-gen4 生成你專案的文檔
+          # 這會自動處理你的所有檔案並生成一個漂亮的網站
+          ./doc-gen4/build/bin/doc-gen4 lib Lean4RealConstruction # 假設你的 library 名稱是 MyReal
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.leanink_out'
+          path: '.lake/build/doc'
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
