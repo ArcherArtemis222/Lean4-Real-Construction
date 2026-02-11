@@ -35,7 +35,7 @@ jobs:
           lake build
 
           # 3. 執行生成 (請將 'MyReal' 替換為你 lakefile.toml 裡的 lean_lib name)
-          $DOCGEN_EXE --single-extension Lean4RealConstruction
+          $DOCGEN_EXE Lean4RealConstruction
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
