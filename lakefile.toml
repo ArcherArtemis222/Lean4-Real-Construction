@@ -1,0 +1,10 @@
+name = "Lean4-Real-Construction"
+version = "0.1.0"
+defaultTargets = ["lean4-real-construction"]
+
+[[lean_lib]]
+name = "Lean4RealConstruction"
+
+[[lean_exe]]
+name = "lean4-real-construction"
+root = "Main"
