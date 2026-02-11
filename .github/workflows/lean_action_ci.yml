@@ -22,18 +22,19 @@ jobs:
 
       - name: Build and Generate Docs
         run: |
-          # 1. 下載 doc-gen4 (這是官方目前用來生網頁的標準工具)
-          # 它比 leanink 更強大，支援搜尋和跨檔案跳轉
-          git clone https://github.com/leanprover/doc-gen4.git
+          # 1. 進入 doc-gen4 目錄編譯
           cd doc-gen4
-          # 確保 doc-gen4 跑在你的 toolchain 下
           elan override set $(cat ../lean-toolchain)
           lake build
+          # 取得 doc-gen4 執行檔的絕對路徑
+          DOCGEN_EXE="$(pwd)/.lake/build/bin/doc-gen4"
           cd ..
 
-          # 2. 透過 doc-gen4 生成你專案的文檔
-          # 這會自動處理你的所有檔案並生成一個漂亮的網站
-          ./doc-gen4/build/bin/doc-gen4 lib Lean4RealConstruction/Basic # 假設你的 library 名稱是 MyReal
+          # 2. 回到根目錄編譯你的主專案 (確保 olean 檔案存在)
+          lake build
+
+          # 3. 執行生成 (請將 'MyReal' 替換為你 lakefile.toml 裡的 lean_lib name)
+          $DOCGEN_EXE lib Lean4RealConstruction # 假設你的 library 名稱是 MyReal
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
