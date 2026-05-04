@@ -4,7 +4,6 @@ import Mathlib.Algebra.Field.Defs
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Real.Archimedean
 import Mathlib.Tactic
-import Paperproof
 
 open Set Classical
 

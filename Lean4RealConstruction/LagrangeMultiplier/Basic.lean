@@ -14,7 +14,6 @@ import Lean4RealConstruction.LagrangeMultiplier.PairComponent
 import Lean4RealConstruction.LagrangeMultiplier.PrefixSplit
 import Lean4RealConstruction.LagrangeMultiplier.Implicit
 import Lean4RealConstruction.LagrangeMultiplier.LinearAlgebra
-import PaperProof
 
 noncomputable section
 
@@ -596,3 +595,5 @@ by
   ker_fderiv_eq_normalSpace_orthogonal, orthogonal_orthogonal, h3] at h1
 
 end LagrangeMultiplier
+
+--
