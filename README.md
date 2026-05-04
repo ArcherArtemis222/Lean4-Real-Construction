@@ -1,2 +1,7 @@
-# Lean4-Real-Construction# Lean4-Real-Construction
-# Lean4-Real-Construction
+# My Lean4-MathConstruction
+
+## Construction of Real Numbers using Dedekind Cut
+
+
+
+## Coordinate-Dependent Proof for Lagrange Multiplier
