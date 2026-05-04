@@ -14,7 +14,6 @@ import Lean4RealConstruction.LagrangeMultiplier.PairComponent
 import Lean4RealConstruction.LagrangeMultiplier.PrefixSplit
 import Lean4RealConstruction.LagrangeMultiplier.Implicit
 import Lean4RealConstruction.LagrangeMultiplier.LinearAlgebra
-import PaperProof
 
 noncomputable section
 
