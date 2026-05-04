@@ -595,3 +595,5 @@ by
   ker_fderiv_eq_normalSpace_orthogonal, orthogonal_orthogonal, h3] at h1
 
 end LagrangeMultiplier
+
+--
